@@ -10,6 +10,7 @@ ModUtils
 
 ## FOF Change table
 In order of trigger move, and then Earth, Wind, Water, Fire fofs.
+```
 	add_fof_change("MOVE_SMACK_NAME", "MOVE_COAL_STORY_NAME", "MOVE_ZEPHYR_NAME", "TO_MOVE_SPLASH_NAME", "MOVE_SUPERHEATED_FIST_NAME")
 	add_fof_change("MOVE_SPIT_NAME", "MOVE_COAL_STORY_NAME", "MOVE_ZEPHYR_NAME", "TO_MOVE_SPLASH_NAME", "MOVE_INFLAME_NAME")
 	add_fof_change("MOVE_WALLOP_NAME", "", "", "", "MOVE_SUPERHEATED_FIST_NAME")
@@ -35,6 +36,7 @@ In order of trigger move, and then Earth, Wind, Water, Fire fofs.
 	add_fof_change("MOVE_ELEMENTAL_WALL_NAME", "MOVE_EARTH_WALL_NAME", "MOVE_WIND_WALL_NAME", "MOVE_WATER_WALL_NAME", "MOVE_FIRE_WALL_NAME")
 	add_fof_change("MOVE_BAD_FORECAST_NAME", "MOVE_SANDSTORM_NAME", "MOVE_THUNDER_BLAST_NAME", "MOVE_BLIZZARD_NAME", "MOVE_SCORCH_NAME")
 	add_fof_change("MOVE_HYPNOTISE_NAME", "MOVE_WONDERFUL_7_NAME", "MOVE_WONDERFUL_7_NAME", "MOVE_WONDERFUL_7_NAME", "MOVE_WONDERFUL_7_NAME")
+```
 
 ## Attribution
 All original mod assets, scripts, and edits are published under MIT license
