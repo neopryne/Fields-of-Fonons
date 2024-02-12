@@ -1,0 +1,26 @@
+[gd_resource type="Resource" load_steps=3 format=2]
+
+[ext_resource path="res://mods/tales_of_movepack/ui/fof_water.png" type="Texture" id=1]
+[ext_resource path="res://mods/tales_of_movepack/status_effect_scripts/TO_FofWater.gd" type="Script" id=2]
+
+[resource]
+script = ExtResource( 2 )
+name = "STATUS_FOF_WATER_NAME"
+description = "STATUS_FOF_WATER_DESCRIPTION"
+has_duration = true
+reduce_duration_at = 0
+icon = ExtResource( 1 )
+is_removable = true
+is_transferable = true
+is_buff = false
+is_debuff = false
+is_decoy = false
+always_hidden_from_display = false
+tags = [  ]
+toast_on_remove = ""
+vfx_on_add = [  ]
+vfx_on_remove = [  ]
+name_modifier = ""
+sprite_animation_prefix = ""
+sprite_animation_prefix_priority = 0
+toast_before_change = "FOF Change!"

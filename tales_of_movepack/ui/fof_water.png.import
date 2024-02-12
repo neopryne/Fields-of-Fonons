@@ -1,0 +1,35 @@
+[remap]
+
+importer="texture"
+type="StreamTexture"
+path="res://.import/fof_water.png-a71cc327ab7d013ef9a64795a0262f34.stex"
+metadata={
+"vram_texture": false
+}
+
+[deps]
+
+source_file="res://mods/tales_of_movepack/ui/fof_water.png"
+dest_files=[ "res://.import/fof_water.png-a71cc327ab7d013ef9a64795a0262f34.stex" ]
+
+[params]
+
+compress/mode=0
+compress/lossy_quality=0.7
+compress/hdr_mode=0
+compress/bptc_ldr=0
+compress/normal_map=0
+flags/repeat=0
+flags/filter=false
+flags/mipmaps=false
+flags/anisotropic=false
+flags/srgb=0
+process/fix_alpha_border=true
+process/premult_alpha=false
+process/HDR_as_SRGB=false
+process/invert_color=false
+process/normal_map_invert_y=false
+stream=false
+size_limit=0
+detect_3d=false
+svg/scale=1.0

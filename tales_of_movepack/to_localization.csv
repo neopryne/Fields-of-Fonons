@@ -1,0 +1,59 @@
+key,en
+TO_MOVE_FANG_BLADE_NAME,[To] Fang Blade
+TO_MOVE_DESCRIPTION_FANG_BLADE,Slash your foe for moderate melee damage.
+TO_MOVE_FIRST_AID_NAME,[To] First Aid
+TO_MOVE_DESCRIPTION_FIRST_AID,Restore 25% of Max HP to one target.
+TO_MOVE_ENERGY_BLAST_NAME,[To] Energy Blast
+TO_MOVE_DESCRIPTION_ENERGY_BLAST,Hits one target with an elemental explosion.
+TO_MOVE_PHOTON_NAME,[To] Photon
+TO_MOVE_DESCRIPTION_PHOTON,"Light converges on a single point, damaging a target.  Can’t be dodged."
+TO_MOVE_FROZEN_HAMMER_NAME,[To] Frozen Hammer
+TO_MOVE_DESCRIPTION_FROZEN_HAMMER,"A bigger, colder hammer."
+TO_MOVE_SPLASH_NAME,[To] Splash
+TO_MOVE_DESCRIPTION_SPLASH,Causes water to stream down on a target.
+TO_MOVE_TURBULENCE_NAME,[To] Turbulence
+TO_MOVE_DESCRIPTION_TURBULENCE,Fierce winds buffet the target.  May create small wind walls. (25% chance per fighter)
+TO_MOVE_STALAGMITE_NAME,[To] Stalagmite
+TO_MOVE_DESCRIPTION_STALAGMITE,"Rocks jut out from the ground, damaging the targeted enemy and possibly causing them to flinch. (40%)"
+TO_MOVE_FLAME_BURST_NAME,[To] Flame Burst
+TO_MOVE_DESCRIPTION_FLAME_BURST,Flames damage a single target.  Crits more often.
+TO_MOVE_EXPLOSION_NAME,[To] Explosion
+TO_MOVE_DESCRIPTION_EXPLOSION,Engulfs the battlefield in a large explosion.  An attack without parallel.
+TO_MOVE_FLARE_TORNADO_NAME,[To] Flare Tornado
+TO_MOVE_DESCRIPTION_FLARE_TORNADO,Hits all foes with a raging flaming whirlwind.  Inflicts burn.
+TO_MOVE_ERUPTION_NAME,[To] Eruption
+TO_MOVE_DESCRIPTION_ERUPTION,"Lava surges from the ground, igniting a foe."
+TO_MOVE_ICICLE_RAIN_NAME,[To] Icicle Rain
+TO_MOVE_DESCRIPTION_ICICLE RAIN,"Hits all foes with a shower of icy blades, limiting their movement."
+TO_MOVE_FREE_RUN_NAME,[To] Free Run
+TO_MOVE_DESCRIPTION_FREE_RUN,"Using advanced FR-LMBS technology, randomly redistribute all active FOFs at the end of every turn."
+TO_MOVE_SUNLIGHT_CHAMBER_NAME,[To] Sunlight Chamber
+TO_MOVE_DESCRIPTION_SUNLIGHT_CHAMBER,Allows partial FoFs that match the user’s type to be used for FoF changes.
+TO_BATTLE_TOAST_FOF,Field of Fonons
+TO_BATTLE_TOAST_FOF_CHANGE,FoF Change!
+STATUS_FOF_DARK_PARTIAL_NAME,Faint Field of Fonons: Dark
+STATUS_FOF_DARK_PARTIAL_DESCRIPTION,A sparse field of first fonons.  Counts as both Earth and Water fields. Requires additional fonons to be a catalyst for advanced artes.
+STATUS_FOF_DARK_NAME,Field of Fonons: Dark
+STATUS_FOF_DARK_DESCRIPTION,A dense field of first fonons.  Counts as both Earth and Water fields.  Matching artes absorb the power of the field to evoke greater power.
+STATUS_FOF_EARTH_PARTIAL_NAME,Faint Field of Fonons: Earth
+STATUS_FOF_EARTH_PARTIAL_DESCRIPTION,A sparse field of second fonons.  Requires additional fonons to be a catalyst for advanced artes.
+STATUS_FOF_EARTH_NAME,Field of Fonons: Earth
+STATUS_FOF_EARTH_DESCRIPTION,A dense field of second fonons.  Matching artes absorb the power of the field to evoke greater power.
+STATUS_FOF_AIR_PARTIAL_NAME,Faint Field of Fonons: Air
+STATUS_FOF_AIR_PARTIAL_DESCRIPTION,A sparse field of third fonons. Requires additional fonons to be a catalyst for advanced artes.
+STATUS_FOF_AIR_NAME,Field of Fonons: Air
+STATUS_FOF_AIR_DESCRIPTION,A dense field of third fonons.  Matching artes absorb the power of the field to evoke greater power.
+STATUS_FOF_WATER_PARTIAL_NAME,Faint Field of Fonons: Water
+STATUS_FOF_WATER_PARTIAL_DESCRIPTION,A sparse field of fourth fonons.  Requires additional fonons to be a catalyst for advanced artes.
+STATUS_FOF_WATER_NAME,Field of Fonons: Water
+STATUS_FOF_WATER_DESCRIPTION,A dense field of fourth fonons.  Matching artes absorb the power of the field to evoke greater power.
+STATUS_FOF_FIRE_PARTIAL_NAME,Faint Field of Fonons: Fire
+STATUS_FOF_FIRE_PARTIAL_DESCRIPTION,A sparse field of fifth fonons. Requires additional fonons to be a catalyst for advanced artes.
+STATUS_FOF_FIRE_NAME,Field of Fonons: Fire
+STATUS_FOF_FIRE_DESCRIPTION,A dense field of fifth fonons.  Matching artes absorb the power of the field to evoke greater power.
+STATUS_FOF_LIGHT_PARTIAL_NAME,Faint Field of Fonons: Light
+STATUS_FOF_LIGHT_PARTIAL_DESCRIPTION,A sparse field of sixth fonons. Counts as both Air and Fire fields.  Requires additional fonons to be a catalyst for advanced artes.
+STATUS_FOF_LIGHT_NAME,Field of Fonons: Light
+STATUS_FOF_LIGHT_DESCRIPTION,A dense field of sixth fonons.  Counts as both Air and Fire fields.  Matching artes absorb the power of the field to evoke greater power.
+BOOSTER_PACK_TO_SET1_NAME,[To] 'Abyss' Sticker Pack
+BOOSTER_PACK_TO_SET1_DESCRIPTION,"A themed booster pack of 3 stickers, with one guaranteed uncommon or rare."
