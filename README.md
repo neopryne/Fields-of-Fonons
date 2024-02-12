@@ -41,6 +41,6 @@ In order of trigger move, and then Earth, Wind, Water, Fire fofs.
 ## Attribution
 All original mod assets, scripts, and edits are published under MIT license
 
-Project structure from (Synergy is Fun)[https://github.com/TheOnly8Z/CassetteBeasts_SynergyIsFun]
+Project structure from [Synergy is Fun](https://github.com/TheOnly8Z/CassetteBeasts_SynergyIsFun)
 
 Cassette Beasts is developed by Bytten Studio and published by Raw Fury.
