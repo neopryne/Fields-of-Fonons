@@ -119,11 +119,13 @@ func run_battle():
 			
 			fighter.damage_this_round = 0
 			fighter.next_tape = null
-			fighter.next_item = null
+			fighter.next_items.clear()
 			fighter.will_fuse = false
 			fighter.just_desynced = false
 		
-		do_sync_check()
+		var sync_co = do_sync_check()
+		if sync_co is GDScriptFunctionState:
+			yield (sync_co, "completed")
 		
 		battle.events.order_phase = true
 		while _is_any_untransformed():
@@ -179,20 +181,27 @@ func transform_humans():
 	if request:
 		request.start_next_tape()
 	
+	var transforms: = []
+	
 	
 	for fighter in battle.get_fighters(false):
 		if not fighter.is_transformed() and not fighter.is_player_controlled() and not fighter.is_remote_player_controlled():
-			var co = _transform_human(fighter)
-			if co is GDScriptFunctionState:yield (co, "completed")
-			if battle.is_battle_over():return 
+			var transform = _transform_human(fighter)
+			if transform is GDScriptFunctionState:
+				transform = yield (transform, "completed")
+			transforms.push_back(transform)
+	
+	
+	yield (battle.wait_for_animations(), "completed")
 	
 	
 	for fighter in battle.get_fighters(false):
 		if not fighter.is_transformed() and fighter.is_player_controlled():
-			var co = _transform_human(fighter)
-			if co is GDScriptFunctionState:yield (co, "completed")
-			if battle.is_battle_over():return 
-	
+			var transform = _transform_human(fighter)
+			if transform is GDScriptFunctionState:
+				transform = yield (transform, "completed")
+			transforms.push_back(transform)
+
 	if request:
 		var co = request.wait_for_next_tapes()
 		if co is GDScriptFunctionState:
@@ -201,9 +210,44 @@ func transform_humans():
 	
 	for fighter in battle.get_fighters(false):
 		if not fighter.is_transformed() and fighter.is_remote_player_controlled():
-			var co = _transform_human(fighter)
-			if co is GDScriptFunctionState:yield (co, "completed")
-			if battle.is_battle_over():return 
+			var transform = _transform_human(fighter)
+			if transform is GDScriptFunctionState:
+				transform = yield (transform, "completed")
+			transforms.push_back(transform)
+
+	
+	
+	transforms.sort_custom(self, "_cmp_transform")
+	
+	
+	for transform in transforms:
+		battle.rand.push_seed(transform.seed_value)
+		battle.camera_set_state("request_use_next_tape", [transform.fighter.slot])
+		transform.transform.call_func()
+		
+		transform.turn_action_queue = battle.turn_action_queue.duplicate()
+		battle.turn_action_queue.clear()
+		transform.seed_value = battle.rand.seed_value
+		battle.rand.pop()
+		
+	assert (battle.turn_action_queue.size() == 0)
+	yield (flush_turn_action_queue(), "completed")
+	
+	
+	for transform in transforms:
+		battle.rand.push_seed(transform.seed_value)
+		battle.turn_action_queue.append_array(transform.turn_action_queue)
+		yield (flush_turn_action_queue(), "completed")
+		battle.rand.pop()
+
+func _cmp_transform(a, b)->bool:
+	if a.priority > b.priority:
+		return true
+	if a.priority == b.priority:
+		
+		return a.fighter.get_index() < b.fighter.get_index()
+	assert (a.priority < b.priority)
+	return false
 
 func _transform_human(fighter):
 	assert ( not fighter.is_transformed())
@@ -213,15 +257,24 @@ func _transform_human(fighter):
 	var tape_jam = fighter.status.get_effect_node(TapeJam)
 	assert ( not tape_jam)
 	if tape_jam:
+		
 		tape_jam.remove()
 	
-	battle.camera_set_state("request_use_next_tape", [fighter.slot])
-	var co = fighter.get_controller().request_use_next_tape()
-	if co is GDScriptFunctionState:
-		yield (co, "completed")
-	yield (flush_turn_action_queue(), "completed")
+	var transform = fighter.get_controller().request_use_next_tape()
+	if transform is GDScriptFunctionState:
+		transform = yield (transform, "completed")
+	assert (transform is Bind)
+	var seed_value = battle.rand.seed_value
+	var priority = fighter.status.speed * 100 + battle.rand.rand_int(100)
 	
 	battle.rand.pop()
+	
+	return {
+		priority = priority, 
+		seed_value = seed_value, 
+		fighter = fighter, 
+		transform = transform, 
+	}
 
 func do_sync_check():
 	var net_request = battle.get_net_request()
@@ -233,7 +286,9 @@ func do_sync_check():
 		print(states)
 		net_request.send_state_hash(states.hash())
 		
-		net_request.check_state_hash()
+		var co = net_request.check_state_hash()
+		if co is GDScriptFunctionState:
+			yield (co, "completed")
 
 func request_orders():
 	
@@ -261,13 +316,16 @@ func request_orders():
 	
 	
 	fighters = battle.get_fighters(false)
+	
+	
+	
 	for fighter in fighters:
 		if fighter.get_controller().uses_order_menu():
 			if ui_orders.has(fighter):
 				orders += ui_orders[fighter]
 				for order in ui_orders[fighter]:
 					print(order)
-		elif not battle.events.notify("request_orders", {fighter = fighter}):
+		elif fighter.get_controller() is RemotePlayerFighterController and not battle.events.notify("request_orders", {fighter = fighter}):
 			var fighter_orders = fighter.get_controller().request_orders()
 			if fighter_orders is GDScriptFunctionState:
 				fighter_orders = yield (fighter_orders, "completed")
@@ -278,11 +336,43 @@ func request_orders():
 				if order.type == BattleOrder.OrderType.FLEE:
 					battle.fleeing_team = order.fighter.team
 					return 
+				
+				orders.push_back(order)
+			yield (Co.next_frame(), "completed")
+	
+	
+	
+	var i: = 0
+	while i < orders.size():
+		var order:BattleOrder = orders[i]
+		
+		if order.type == BattleOrder.OrderType.ITEM and order.order and order.order.item.battle_usage == BaseItem.BattleUsage.FREE_USE:
+			if not order.argument or not order.argument.get("already_used"):
+				assert (order.fighter.get_controller() is RemotePlayerFighterController)
+				order.order.use(BaseItem.ContextKind.CONTEXT_BATTLE, order.fighter, order.argument)
+			
+			orders.remove(i)
+			continue
+				
+		i += 1
+	
+	
+	for fighter in fighters:
+		if fighter.get_controller().uses_order_menu() or fighter.get_controller() is RemotePlayerFighterController:
+			continue
+		
+		if not battle.events.notify("request_orders", {fighter = fighter}):
+			var fighter_orders = fighter.get_controller().request_orders()
+			if fighter_orders is GDScriptFunctionState:
+				fighter_orders = yield (fighter_orders, "completed")
+			assert (fighter_orders is Array)
+			
+			for order in fighter_orders:
+				print(order)
 				orders.push_back(order)
 			yield (Co.next_frame(), "completed")
 	
 	battle.opposing_team_preview.disable()
-	
 
 func request_ui_orders():
 	var order_menu = preload("res://battle/ui/OrderMenu.tscn").instance()
@@ -296,9 +386,15 @@ func request_ui_orders():
 	var result = {}
 	for order in ui_orders:
 		assert (order.fighter)
+		
+		
+		if order.type == BattleOrder.OrderType.ITEM and order.argument and order.argument.get("already_used"):
+			continue
+		
 		if not result.has(order.fighter):
 			result[order.fighter] = []
 		result[order.fighter].push_back(order)
+	
 	return result
 
 func run_advantages():
@@ -430,7 +526,11 @@ func _sort_order_pair(a:BattleOrder, b:BattleOrder):
 	if a.priority < b.priority:
 		return false
 	if a.type == BattleOrder.OrderType.FIGHT and b.type == BattleOrder.OrderType.FIGHT:
-		return a.speed > b.speed
+		if a.speed > b.speed:
+			return true
+		if a.speed < b.speed:
+			return false
+		return a.tie_break > b.tie_break
 	return false
 
 func execute_order(order:BattleOrder):
@@ -458,7 +558,7 @@ func execute_order(order:BattleOrder):
 		order.notify_executed()
 
 func execute_fuse(order:BattleOrder):
-	if order.argument and order.argument.already_done:
+	if order.argument and order.argument.get("already_done"):
 		return 
 	if not order.argument:
 		order.argument = {}
@@ -467,7 +567,12 @@ func execute_fuse(order:BattleOrder):
 	if order.fighter.is_fusion():
 		_execute_unfuse(order)
 		return 
-	var fuser = order.fighter.get_fuser()
+	
+	var fuser = null
+	if order.argument and order.argument.has("fuser"):
+		fuser = order.argument.fuser
+	else :
+		fuser = order.fighter.get_fuser()
 	if fuser == null:
 		return 
 	
@@ -480,40 +585,29 @@ func execute_fuse(order:BattleOrder):
 	
 	battle.events.notify("before_fuse_starting", {"fighters":team})
 	var name0 = team[0].get_name_with_team()
-	var name1 = team[1].get_general_name()
+	var name1 = team[1].get_general_name() if team[1] is FighterNode else team[1].character.name
 	
-	battle.queue_camera_set_state("fusion", [team[0].slot, team[1].slot])
+	battle.queue_camera_set_state("fusion", [team[0].slot, team[1].slot] if team[1] is FighterNode else [team[0].slot])
 	
-	battle.queue_message(Loc.trf("BATTLE_FUSING", [name0, name1]), true)
 	
 	var is_fusing = not battle.events.notify("fuse_starting", {"fighters":team})
 	if is_fusing:
-		team[0].set_decoy(null)
-		team[1].set_decoy(null)
 		
-		for c in team[1].get_characters():
-			team[1].remove_child(c)
-			team[0].add_child(c)
+		if not (fuser is FighterNode):
+			var vfx: = [OutOfBattleFuseVfx.new()]
+			vfx[0].character = fuser.character
+			battle.queue_animation(Bind.new(order.fighter, "animate_vfx_sequence", [vfx]))
 			
-			if order.fighter.team == 0 and c.character.partner_id != "":
-				SaveState.set_flag("fused_with_" + c.character.partner_id, true)
-				SaveState.stats.get_stat("fused_with").report_event(c.character.partner_id)
+		battle.queue_message(Loc.trf("BATTLE_FUSING", [name0, name1]), true)
 		
-		order.fighter.status.refresh_stats()
+		if fuser is FighterNode:
+			_normal_fuse(order.fighter, fuser)
+		else :
+			_out_of_battle_fuse(order.fighter, fuser.character, fuser.tape)
 		
-		for effect in team[1].status.get_effects():
-			team[1].status.remove_child(effect)
-			team[0].status.add_effect_quietly(effect)
-		team[0].status.refresh_stats()
-		team[0].status.ap += team[1].status.ap
-		battle.remove_child(team[1])
-		var vacant_slot = team[1].slot
-		battle.queue_animation(Bind.new(self, "_animate_fusion", [team, team[0].generate_transform_animation(), vacant_slot, team[0].slot]))
-		team[0].status.update_decoy()
-		battle.events.notify("fuse_ending", {"fighter":team[0]})
-		
-		battle.queue_animation(Bind.new(self, "_after_fusion", [order.fighter.team, team[0].get_species()]))
-		
+		battle.events.notify("fuse_ending", {"fighter":order.fighter})
+		battle.queue_animation(Bind.new(self, "_after_fusion", [order.fighter, order.fighter.get_species()]))
+	
 	battle.queue_hide_message()
 	
 	if is_fusing:
@@ -522,8 +616,51 @@ func execute_fuse(order:BattleOrder):
 	
 	battle.rand.pop()
 
-func _after_fusion(team:int, species:Array):
-	if team == 0:
+func _normal_fuse(fighter:FighterNode, fuser:FighterNode)->void :
+	fighter.set_decoy(null)
+	fuser.set_decoy(null)
+	
+	for c in fuser.get_characters():
+		fuser.remove_child(c)
+		fighter.add_child(c)
+		
+		if fighter.team == 0 and c.character.partner_id != "":
+			SaveState.set_flag("fused_with_" + c.character.partner_id, true)
+			SaveState.stats.get_stat("fused_with").report_event(c.character.partner_id)
+	
+	fighter.status.refresh_stats()
+	
+	for effect in fuser.status.get_effects():
+		fuser.status.remove_child(effect)
+		fighter.status.add_effect_quietly(effect)
+	fighter.status.refresh_stats()
+	fighter.status.ap += fuser.status.ap
+	battle.remove_child(fuser)
+	
+	var vacant_slot = fuser.slot
+	battle.queue_animation(Bind.new(self, "_animate_fusion", [[fighter, fuser], fighter.generate_transform_animation(), vacant_slot, fighter.slot]))
+	fighter.status.update_decoy()
+
+func _out_of_battle_fuse(fighter:FighterNode, fuser_char:Character, fuser_tape:MonsterTape)->void :
+	assert (fuser_char)
+	assert (fuser_tape)
+	
+	var char_node = CharacterNode.new()
+	char_node.character = fuser_char
+	char_node.active_tape = fuser_tape
+	char_node.temporary_fusion_part = true
+	fighter.add_child(char_node)
+	
+	if fuser_char.partner_id != "" and fighter.team == 0 and fighter.get_controller().is_player():
+		SaveState.set_flag("fused_with_" + fuser_char.partner_id, true)
+		SaveState.stats.get_stat("fused_with").report_event(fuser_char.partner_id)
+	
+	fighter.status.refresh_stats()
+	
+	battle.queue_animation(Bind.new(self, "_animate_out_of_battle_fusion", [fighter, fuser_char, fighter.generate_transform_animation()]))
+
+func _after_fusion(fighter:FighterNode, species:Array):
+	if fighter.team == 0 and fighter.get_controller().is_player():
 		SaveState.stats.get_stat("fusions_formed").report_event(species)
 	else :
 		SaveState.stats.get_stat("fusions_encountered").report_event(species)
@@ -553,6 +690,16 @@ func _animate_fusion(team, transform_anim:Bind, vacant_slot, fusion_slot):
 	
 	MusicSystem.mute = false
 
+func _animate_out_of_battle_fusion(fighter, fuser_char, fighter_transform:Bind):
+	if battle.battle_music_vox and UserSettings.audio_vocals:
+		battle.music.crossfade(battle.battle_music_vox)
+	
+	var vfx: = [OutOfBattleFuseVfx.new()]
+	vfx[0].character = fuser_char
+	vfx[0].part = 1
+	var co_list: = [fighter.animate_vfx_sequence(vfx), fighter_transform.call_func()]
+	return Co.join(co_list)
+
 func _animate_fusion_zoom(_team, fusion_slot):
 	battle.camera_set_state("fusion_zoom", [fusion_slot], 0.2)
 	yield (Co.wait(0.2), "completed")
@@ -581,66 +728,77 @@ func unfuse(fighter, message:String = "")->bool:
 		
 		var heal_after_unfuse = not Character.is_human(fighter.get_character_kind())
 		
-		fighter.set_decoy(null)
-		
-		var new_fighter = FighterNode.new()
-		new_fighter.team = fighter.team
-		
 		var char2 = fighter.get_characters()[1]
-		fighter.remove_child(char2)
-		new_fighter.add_child(char2)
+		var new_fighter = null
+		if not char2.temporary_fusion_part:
+			fighter.set_decoy(null)
+			new_fighter = FighterNode.new()
+			new_fighter.team = fighter.team
 		
-		battle.add_child_below_node(fighter, new_fighter)
-		new_fighter.set_preferred_slot()
-		assert (new_fighter.slot != null)
-		if new_fighter.slot.get_index() < fighter.slot.get_index():
+		fighter.remove_child(char2)
+		if new_fighter:
+			new_fighter.add_child(char2)
+			battle.add_child_below_node(fighter, new_fighter)
 			
-			
-			
-			battle.move_child(new_fighter, fighter.get_index())
+			new_fighter.set_preferred_slot()
+			assert (new_fighter.slot != null)
+			if new_fighter.slot.get_index() < fighter.slot.get_index():
+				
+				
+				
+				battle.move_child(new_fighter, fighter.get_index())
+		else :
+			battle.queue_node_free(char2)
 		
 		fighter.status.refresh_stats()
-		new_fighter.status.refresh_stats()
 		
-		
-		var total_ap = fighter.status.ap
-		var half_ap = int(total_ap / 2)
-		fighter.status.ap = half_ap
-		new_fighter.status.ap = half_ap
-		if 2 * half_ap < total_ap:
-			(fighter if battle.rand.rand_bool() else new_fighter).status.ap += total_ap - 2 * half_ap
-		
-		new_fighter.add_child(fighter.get_controller().unfuse())
-		
-		
-		for effect in fighter.status.get_effects():
-			effect.unfuse(new_fighter)
+		if new_fighter:
+			new_fighter.status.refresh_stats()
+			
+			
+			var total_ap = fighter.status.ap
+			var half_ap = int(total_ap / 2)
+			fighter.status.ap = half_ap
+			new_fighter.status.ap = half_ap
+			if 2 * half_ap < total_ap:
+				(fighter if battle.rand.rand_bool() else new_fighter).status.ap += total_ap - 2 * half_ap
+			
+			new_fighter.add_child(fighter.get_controller().unfuse())
+			
+			
+			for effect in fighter.status.get_effects():
+				effect.unfuse(new_fighter)
 		
 		if heal_after_unfuse:
 			fighter.status.hp = fighter.status.max_hp
-			new_fighter.status.hp = new_fighter.status.max_hp
-			
-		new_fighter.get_controller().join_battle(false)
+			if new_fighter:
+				new_fighter.status.hp = new_fighter.status.max_hp
 		
-		if message != "":
+		if new_fighter:
+			new_fighter.get_controller().join_battle(false)
+		
+		if message != "" and new_fighter:
 			var name0 = fighter.get_name_with_team()
 			var name1 = new_fighter.get_name_with_disambiguator()
 			battle.queue_message(Loc.trf(message, [name0, name1]))
 		
-		var snap1 = fighter.status.get_snapshot()
-		var snap2 = new_fighter.status.get_snapshot()
-		var transform_anim = fighter.generate_transform_animation()
-		var transform2_anim = new_fighter.generate_transform_animation()
-		var enter_slot_anim = new_fighter.generate_enter_slot_animation()
-		battle.queue_animation(Bind.new(self, "_animate_unfusion", [fighter, new_fighter, snap1, snap2, new_fighter.slot, transform_anim, transform2_anim, enter_slot_anim]))
-		fighter.status.update_decoy()
-		new_fighter.status.update_decoy()
+		if new_fighter:
+			var snap1 = fighter.status.get_snapshot()
+			var snap2 = new_fighter.status.get_snapshot()
+			var transform_anim = fighter.generate_transform_animation()
+			var transform2_anim = new_fighter.generate_transform_animation()
+			var enter_slot_anim = new_fighter.generate_enter_slot_animation()
+			battle.queue_animation(Bind.new(self, "_animate_unfusion", [fighter, new_fighter, snap1, snap2, new_fighter.slot, transform_anim, transform2_anim, enter_slot_anim]))
+			fighter.status.update_decoy()
+			new_fighter.status.update_decoy()
+		else :
+			battle.queue_animation(Bind.new(self, "_animate_out_of_battle_unfusion", [fighter, char2.character, fighter.generate_transform_animation()]))
 		
 		if heal_after_unfuse:
 			var flinch = preload("res://data/status_effects/flinch.tres") as StatusEffect
 			if not fighter.status.has_tag("flinch"):
 				fighter.status.add_effect(flinch, 1)
-			if not new_fighter.status.has_tag("flinch"):
+			if new_fighter and not new_fighter.status.has_tag("flinch"):
 				new_fighter.status.add_effect(flinch, 1)
 		
 		battle.events.notify("unfuse_ending", {"fighters":[fighter, new_fighter]})
@@ -649,6 +807,16 @@ func unfuse(fighter, message:String = "")->bool:
 	
 	battle.rand.pop()
 	return result
+
+func _animate_out_of_battle_unfusion(fighter, fuser_char:Character, fighter_animation:Bind):
+	if battle.battle_music and not _find_human_fusion():
+		battle.music.crossfade(battle.battle_music)
+	
+	var vfx: = [OutOfBattleFuseVfx.new()]
+	vfx[0].character = fuser_char
+	vfx[0].unfuse = true
+	fighter.animate_vfx_sequence(vfx)
+	return fighter_animation.call_func()
 
 func _find_human_fusion():
 	for f in battle.get_fighters():
@@ -904,6 +1072,7 @@ func execute_move(order:BattleOrder):
 	var move:BattleMove = order.order
 	var arg = order.argument
 # PATCH: ADD LINES HERE
+	print("toa fof enabled: ", toa_mod.to_enable_fof_interactions)
 	if (toa_mod.to_enable_fof_interactions):
 		move = fof_change_check(move, user)
 		move = add_residual_fonic_effects(move, user)
