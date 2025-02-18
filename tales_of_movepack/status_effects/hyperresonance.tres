@@ -23,4 +23,3 @@ vfx_on_remove = [  ]
 name_modifier = ""
 sprite_animation_prefix = ""
 sprite_animation_prefix_priority = 0
-toast_before_change = "Hyperresonance!"

@@ -6,6 +6,7 @@
 
 [resource]
 script = ExtResource( 2 )
+initial_delay = 0.0
 sound = ExtResource( 3 )
 sound_pitch_scale = 1.0
 sound_random_pitch = 1.1
@@ -15,6 +16,7 @@ origin_anchor_name = "attack"
 target_anchor_name = "hit"
 origin_anchor_on_ground = false
 target_anchor_on_ground = false
+play_form_sound = ""
 delay = 0.0
 duration = 1.0
 screen_material = ExtResource( 1 )
