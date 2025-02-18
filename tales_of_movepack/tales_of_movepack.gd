@@ -12,12 +12,6 @@ const MOD_STRINGS:Array = [
 	preload("to_localization.en.translation"),
 ]
 const MODUTILS: Dictionary = {
-	"class_patch": [
-		{
-			"patch": "res://mods/tales_of_movepack/battle/ToBattleController.gd",
-			"target": "res://battle/BattleController.gd"
-		}
-	],
 	"settings": [
 		{
 			"property": "to_enable_fof_interactions",

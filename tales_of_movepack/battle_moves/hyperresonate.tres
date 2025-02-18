@@ -1,0 +1,51 @@
+[gd_resource type="Resource" load_steps=5 format=2]
+
+[ext_resource path="res://mods/tales_of_movepack/attack_vfx/hyperresonate.tres" type="Resource" id=1]
+[ext_resource path="res://data/battle_move_scripts/PureStatus.gd" type="Script" id=2]
+[ext_resource path="res://mods/tales_of_movepack/status_effects/hyperresonance.tres" type="Resource" id=3]
+[ext_resource path="res://data/sticker_attribute_profiles/status.tres" type="Resource" id=4]
+
+[resource]
+script = ExtResource( 2 )
+name = "TO_MOVE_HYPERRESONATE_NAME"
+category_name = "MOVE_CATEGORY_STATUS"
+description = "TO_MOVE_DESCRIPTION_HYPERRESONATE"
+title_override = ""
+tags = [ "to", "to_set1", "anathema", "support", "any" ]
+priority = 0
+cost = 2
+is_debug = false
+is_passive_only = false
+power = 0
+physicality = 1
+target_type = 0
+default_target = 1
+elemental_types = [  ]
+accuracy = 100
+unavoidable = true
+crit_rate_numerator = 1
+crit_rate_denominator = 16
+crit_damage_percent = 150
+play_attack_animation = false
+fade_lights_during_attack = false
+windup_animation = "windup"
+attack_animation = "attack"
+windup_sfx_override = [  ]
+attack_vfx = [ ExtResource( 1 ) ]
+play_attack_vfx_against_allies = true
+attack_duration = 0.0
+hit_vfx = [  ]
+hit_delay = 0.0
+disable_melee_movement = false
+can_be_copied = false
+attribute_profile = ExtResource( 4 )
+camera_state_override = ""
+status_effects = [ ExtResource( 3 ) ]
+amount = 4
+varied_amounts = [  ]
+status_effects_to_apply = 0
+num_at_random = 1
+fail_if_already_present = false
+fail_against_archangels = false
+fail_if_has_tag = ""
+sacrifice_hp_percent = 0
