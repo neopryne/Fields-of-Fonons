@@ -8,16 +8,12 @@ var to_enable_fof_interactions = true
 #func _init():
 #    bestiarymenu.take_over_path("res://mods/tales_of_movepack/battle/BattleController_modified.gd")
 
+var toaBattleController = preload("res://mods/tales_of_movepack/battle/ToBattleController.gd")
+
 const MOD_STRINGS:Array = [
 	preload("to_localization.en.translation"),
 ]
 const MODUTILS: Dictionary = {
-	"class_patch": [
-		{
-			"patch": "res://mods/tales_of_movepack/battle/ToBattleController.gd",
-			"target": "res://battle/BattleController.gd"
-		}
-	],
 	"settings": [
 		{
 			"property": "to_enable_fof_interactions",
@@ -27,8 +23,8 @@ const MODUTILS: Dictionary = {
 	]
 }
 
-
 func _init():
+	toaBattleController.take_over_path("res://battle/BattleController.gd")
 	# Add translation strings
 	for translation in MOD_STRINGS:
 		TranslationServer.add_translation(translation)

@@ -29,6 +29,8 @@ TO_MOVE_FREE_RUN_NAME,[To] Free Run
 TO_MOVE_DESCRIPTION_FREE_RUN,"Using advanced FR-LMBS technology, randomly redistribute all active FOFs at the end of every turn."
 TO_MOVE_SUNLIGHT_CHAMBER_NAME,[To] Sunlight Chamber
 TO_MOVE_DESCRIPTION_SUNLIGHT_CHAMBER,Allows partial FoFs that match the user’s type to be used for FoF changes.
+TO_MOVE_HYPERRESONATE_NAME,Hyperresonate
+TO_MOVE_DESCRIPTION_HYPERRESONATE,"Excites the user’s fonons, putting them in a state of dangerous hyperresonance."
 TO_BATTLE_TOAST_FOF,Field of Fonons
 TO_BATTLE_TOAST_FOF_CHANGE,FoF Change!
 STATUS_FOF_DARK_PARTIAL_NAME,Faint Field of Fonons: Dark
@@ -55,5 +57,7 @@ STATUS_FOF_LIGHT_PARTIAL_NAME,Faint Field of Fonons: Light
 STATUS_FOF_LIGHT_PARTIAL_DESCRIPTION,A sparse field of sixth fonons. Counts as both Air and Fire fields.  Requires additional fonons to be a catalyst for advanced artes.
 STATUS_FOF_LIGHT_NAME,Field of Fonons: Light
 STATUS_FOF_LIGHT_DESCRIPTION,A dense field of sixth fonons.  Counts as both Air and Fire fields.  Matching artes absorb the power of the field to evoke greater power.
+STATUS_HYPERRESONANCE_NAME,Hyperresonance
+STATUS_HYPERRESONANCE_DESCRIPTION,"When two beings with the same fonic makeup, or isofons, interact, they can cause a hyperresonance with powerful and unpredictable results."
 BOOSTER_PACK_TO_SET1_NAME,[To] 'Abyss' Sticker Pack
 BOOSTER_PACK_TO_SET1_DESCRIPTION,"A themed booster pack of 3 stickers, with one guaranteed uncommon or rare."
