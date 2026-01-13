@@ -1,3 +1,5 @@
+![Github All Releases](https://img.shields.io/github/downloads/neopryne/Fields-of-Fonons/total?color=0078D4&style=for-the-badge) ![GitHub Release](https://img.shields.io/github/v/release/neopryne/Fields-of-Fonons?color=05227A&style=for-the-badge) [![GitHub stars](https://img.shields.io/github/stars/neopryne/Fields-of-Fonons?color=F4870A&style=for-the-badge)](https://github.com/neopryne/Fields-of-Fonons/stargazers) [![GitHub issues](https://img.shields.io/github/issues/neopryne/Fields-of-Fonons?color=FF0000&style=for-the-badge)](https://github.com/neopryne/Fields-of-Fonons/issues) [![GitHub forks](https://img.shields.io/github/forks/neopryne/Fields-of-Fonons?color=00AF00&style=for-the-badge)](https://github.com/neopryne/Fields-of-Fonons/network) [![License: IDK](https://img.shields.io/badge/License-MIT?style=for-the-badge)](https://github.com/neopryne/Fields-of-Fonons/blob/main/License.md)
+
 # Fields-of-Fonons
 Cassette Beasts mod that adds the field of fonons system from Tales of the Abyss as well as some moves from it.
 
